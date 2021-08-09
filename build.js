@@ -22,6 +22,11 @@ const getDirectories = source =>
     .filter(dirent => dirent.isDirectory())
     .map(dirent => dirent.name)
 
+const getFiles = source =>
+  readdirSync(source, { withFileTypes: true })
+    .filter(dirent => dirent.isDirectory())
+    .map(dirent => dirent.name)
+
 const pkginfoFile = ({
   pkgname,
   pkgver,
@@ -50,7 +55,7 @@ const repoDir = path.dirname(process.argv[1])
 const distDir = `${repoDir}/stable`
 const dataDir   = `${os.homedir()}/unyw`
 const rootfsDir = `${dataDir}/rootfs`
-const keyFile   = `${dataDir}/key.rsa`
+const keyDir   = `${dataDir}/keys`
 
 const archs = ['x86', 'x86_64', 'armv7', 'aarch64']
 const hostArch = ({
@@ -73,15 +78,14 @@ if(!existsSync(`${rootfsDir}/usr/bin/abuild`)){
 }
 
 // Create key if not exists
-if(!existsSync(keyFile)){
+if(!existsSync(keyDir)){
   console.log(`Key file missing. Generating...`)
   process.chdir(rootfsDir)
-  execLive(`proot -w / -R . ash -c 'echo '/key.rsa' |abuild-keygen'`) 
+  execLive(`mkdir -p ${keyDir} && proot -w / -R . -b '${keyDir}:/keys' ash -c 'read -p "Enter key name: " key && echo "/keys/$key" | abuild-keygen'`) 
   process.chdir(repoDir)
-  execLive(`cp '${rootfsDir}/key.rsa' '${keyFile}' && cp '${rootfsDir}/key.rsa.pub' ${keyFile}.pub` +
-    `&& rm '${rootfsDir}/key.rsa' '${rootfsDir}/key.rsa.pub'`)
-  console.log(`Generated files '${keyFile}' and '${keyFile}.pub'`)
+  console.log(`Generated key files `)
 }
+
 
 
 // Create dist dirs
@@ -154,11 +158,11 @@ args.forEach(el => {
     if(!existsSync('./.unyw_tmp/control/.PKGINFO')) writeFileSync('./.unyw_tmp/control/.PKGINFO', pkginfoFile(info))
 
     // Build package
-    execLive(`proot -w / -R '${rootfsDir}' -b '${keyFile}:/key.rsa' -b '${repoDir}/packages/${package}/.unyw_tmp:/pkgsrc'`
+    execLive(`proot -w / -R '${rootfsDir}' -b '${keyDir}:/keys' -b '${repoDir}/packages/${package}/.unyw_tmp:/pkgsrc'`
     + ` ash -c 'cd /pkgsrc/data    && find * -print0 | LC_ALL=C sort -z | tar --xattrs --format=posix --pax-option=exthdr.name=%d/PaxHeaders/%f,atime:=0,ctime:=0 --no-recursion --null -T - -f - -c | abuild-tar --hash | gzip -9 > ../data.tar.gz`
     + ` && echo "# Hash added automatically by unyw build.js" >> /pkgsrc/control/.PKGINFO && echo "datahash = $(sha256sum /pkgsrc/data.tar.gz | cut -f1 -d\" \")" >> /pkgsrc/control/.PKGINFO`
     + ` && cd /pkgsrc/control && tar -c .PKGINFO --format=posix | abuild-tar --cut | gzip -9 > ../control.tar.gz` 
-    + ` && cd /pkgsrc && abuild-sign -k /key.rsa ./control.tar.gz && cat control.tar.gz data.tar.gz > pkg.apk'`)
+    + ` && cd /pkgsrc && abuild-sign -k /keys/*.rsa ./control.tar.gz && cat control.tar.gz data.tar.gz > pkg.apk'`)
 
     execLive(`cp '${repoDir}/packages/${package}/.unyw_tmp/pkg.apk' '${distDir}/${arch}/${fileName}'`)
   })
@@ -166,7 +170,7 @@ args.forEach(el => {
 
 
 logger.title("Updating APKINDEX.tar.gz")
-archs.forEach(arch => execLive(`proot -w / -R '${rootfsDir}' -b '${keyFile}:/key.rsa' -b '${distDir}/${arch}:/repo'`
- + ` ash -c 'apk index --no-warnings -o /repo/APKINDEX.tar.gz /repo/*.apk && abuild-sign -k /key.rsa /repo/APKINDEX.tar.gz'`))
+archs.forEach(arch => execLive(`proot -w / -R '${rootfsDir}' -b '${keyDir}:/keys' -b '${distDir}/${arch}:/repo'`
+ + ` ash -c 'apk index --no-warnings -o /repo/APKINDEX.tar.gz /repo/*.apk && abuild-sign -k /keys/*.rsa /repo/APKINDEX.tar.gz'`))
 
 logger.title("...done!\n")
