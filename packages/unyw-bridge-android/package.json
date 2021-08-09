@@ -1,0 +1,11 @@
+{
+  "name": "unyw-bridge-android",
+  "version": "1.0.0",
+  "author": "Luca Fabbian <luca.fabbian.1999@gmail.com>",
+  "description": "Unyw bridge for android",
+  "license": "MIT",
+  "unyw-pkginfo": {
+    "depend": ["x11vnc", "xvfb", "bspwm", "dropbear"],
+    "provides": "unyw"
+  }
+}
