@@ -5,14 +5,14 @@ rm -f /tmp/.X3200-lock # Clear previous run
 Xvfb :3200 -screen 0 "$SCREEN_WIDTH"x"$SCREEN_HEIGHT"x16 & sleep 0.5
 p1pid=$! # Remember process Id, so it could be closed lately
 
-echo "root:$UNYW_TOKEN_SSH" | chpsswd
+echo "root:$UNYW_TOKEN_SSH" | chpasswd
 mkdir -p /etc/dropbear
-dropbear -RFE -p 12082
+dropbear -RFE -p 12082 &
 p2pid=$! # Remember process Id, so it could be closed lately
 
 # Start window manager "bspw"
-chmod +x /usr/share/unyw-bridge-android/scripts/bspwm.sh
-bspwm -c /usr/share/unyw-bridge-android/scripts/bspwm.sh &
+chmod +x /usr/share/unyw-bridge-android/bspwm.sh
+bspwm -c /usr/share/unyw-bridge-android/bspwm.sh &
 p3pid=$! # Remember process Id, so it could be closed lately
 
 

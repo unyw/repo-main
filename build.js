@@ -24,7 +24,7 @@ const getDirectories = source =>
 
 const getFiles = source =>
   readdirSync(source, { withFileTypes: true })
-    .filter(dirent => dirent.isDirectory())
+    .filter(dirent => dirent.isFile())
     .map(dirent => dirent.name)
 
 const pkginfoFile = ({
@@ -148,8 +148,12 @@ args.forEach(el => {
     // Copy files
     if(existsSync('app')){
       const appName = info.pkgname.startsWith('unyw-app-') ? info.pkgname.replace('unyw-app-', '') : info.pkgname
-      execSync(`mkdir -p ./.unyw_tmp/data/usr/share/unyw/${appName}` + 
-        ` && cp -R app/. ./.unyw_tmp/data/usr/share/unyw/${appName}`)
+      execSync(`mkdir -p ./.unyw_tmp/data/usr/share/unyw/apps/${appName}` + 
+        ` && cp -R app/. ./.unyw_tmp/data/usr/share/unyw/apps/${appName}`)
+      
+      if(existsSync('app/icon.png')){
+        execSync(`cp app/icon.png '${distDir}/icons/${info.pkgname}'`)
+      }
     }
     if(existsSync(`control`))      execLive(`cp -R control/.      ./.unyw_tmp/control/`)
     if(existsSync(`data/all`))     execLive(`cp -R data/all/.     ./.unyw_tmp/data/`)
@@ -172,5 +176,12 @@ args.forEach(el => {
 logger.title("Updating APKINDEX.tar.gz")
 archs.forEach(arch => execLive(`proot -w / -R '${rootfsDir}' -b '${keyDir}:/keys' -b '${distDir}/${arch}:/repo'`
  + ` ash -c 'apk index --no-warnings -o /repo/APKINDEX.tar.gz /repo/*.apk && abuild-sign -k /keys/*.rsa /repo/APKINDEX.tar.gz'`))
+
+logger.title("Adding manifest.json")
+const manifest = {
+  apps: getFiles(`${distDir}/icons`)
+}
+console.log(JSON.stringify(manifest, null, 2))
+writeFileSync(`${distDir}/manifest.json`, JSON.stringify(manifest, null, 2))
 
 logger.title("...done!\n")

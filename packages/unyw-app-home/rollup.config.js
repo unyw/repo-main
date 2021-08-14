@@ -1,6 +1,7 @@
 import svelte from 'rollup-plugin-svelte';
 import commonjs from '@rollup/plugin-commonjs';
 import resolve from '@rollup/plugin-node-resolve';
+import replace from '@rollup/plugin-replace';
 import livereload from 'rollup-plugin-livereload';
 import { terser } from 'rollup-plugin-terser';
 import css from 'rollup-plugin-css-only';
@@ -32,7 +33,16 @@ export default {
 		}),
 		commonjs(),
 
-		!production && serve('app'),
+		process.env.UNYW_IP && replace({
+			'window.__UNYW_PRIVATE_IP' : JSON.stringify(process.env.UNYW_IP)
+		}),
+
+		!production && serve({
+			host: '0.0.0.0',
+			port: '10001',
+			contentBase: ['app', 'testenv']
+
+		}),
 		!production && livereload('app'),
 
 		// Minify if production

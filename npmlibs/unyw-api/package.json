@@ -1,0 +1,19 @@
+{
+  "name": "@unyw/api",
+  "module": "src/index.js",
+  "main": "src/index.js",
+  "scripts": {
+    "build": "rollup -c",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "svelte",
+    "unyw",
+    "unyw-ui",
+    "material"
+  ],
+  "files": [
+    "src",
+    "dist"
+  ]
+}

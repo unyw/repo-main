@@ -42,13 +42,12 @@
     align-items: center;
     justify-content: center;
     opacity: 60%;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.05s ease;
   }
 
   div.unywui-bottombar > div > div:active {
     opacity: 100%;
     background-color: #00000050;
-    transition: all 0s ease;
   }
   
 
@@ -58,7 +57,7 @@
 
   i {
     margin: 0px;
-    font-size: 20px;
+    font-size: 18.5px;
   }
   p {
     margin: 0;
@@ -67,7 +66,7 @@
 
   .active i {
     margin: 0px;
-    font-size: 24px;
+    font-size: 22.5px;
   }
   .active p {
     font-size: 15px;
