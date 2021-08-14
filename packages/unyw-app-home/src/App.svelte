@@ -65,7 +65,7 @@
 					<div style="width: 60px; height:40px">
 						<img src={`${repo}/icons/${app}.png`} alt={`Icon for ${app}`} height="40px">
 					</div>
-					<span style="font-size: 1rem">{app}</span>
+					<span style="font-size: 1rem">{app.replace('unyw-app-', '')}</span>
 				</div>
 				{/each}
 			{:catch e}

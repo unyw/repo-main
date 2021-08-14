@@ -179,7 +179,7 @@ archs.forEach(arch => execLive(`proot -w / -R '${rootfsDir}' -b '${keyDir}:/keys
 
 logger.title("Adding manifest.json")
 const manifest = {
-  apps: getFiles(`${distDir}/icons`)
+  apps: getFiles(`${distDir}/icons`).map( icon => icon.replace('.png', ''))
 }
 console.log(JSON.stringify(manifest, null, 2))
 writeFileSync(`${distDir}/manifest.json`, JSON.stringify(manifest, null, 2))
