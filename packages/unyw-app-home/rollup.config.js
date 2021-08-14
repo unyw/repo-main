@@ -34,6 +34,7 @@ export default {
 		commonjs(),
 
 		process.env.UNYW_IP && replace({
+			preventAssignment: true,
 			'window.__UNYW_PRIVATE_IP' : JSON.stringify(process.env.UNYW_IP)
 		}),
 

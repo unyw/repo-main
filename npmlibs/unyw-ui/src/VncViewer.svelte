@@ -40,6 +40,7 @@
 
 <div bind:this={vncIframe}>
   {#await vncInfo}
+    <span style="display: none"/>
   {:then {vnc: {token, width, height}}} 
 
     <iframe id="lc-layout-vncviewer" title="vncviewer"

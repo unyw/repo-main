@@ -1,5 +1,5 @@
 <script>
-	import {Bottombar, VncViewer} from '@unyw/ui'
+	import {Bottombar, Checkbox, VncViewer} from '@unyw/ui'
 	import Unyw from '@unyw/api'
 
 	const runCommand = command => Unyw().then(async({file, process}) => {
@@ -33,12 +33,14 @@
 		{#await Unyw()
 			.then( ({file}) => file.list({path: '/usr/share/unyw/apps'}))
 			.then( ({list}) => Object.keys(list))}
-			
+				<span class="hidden"/>
 		{:then apps} 
 			{#each apps as app}
 			<div class="app-container">
-				<img src={`/apps/${app}/icon.png`} alt={`Icon for ${app}`} height="40px" width="40px"/>
-				<p>{app}</p>
+				<div style="width: 60px; height:40px">
+					<img src={`/apps/${app}/icon.png`} alt={`Icon for ${app}`} height="40px">
+				</div>
+				<span style="font-size: 1rem">{app}</span>
 			</div>
 		{/each}
 		{/await}
@@ -47,17 +49,36 @@
 	<div class="page page-add" id="addid">
 		<button>Edit repos <i class="zmdi zmdi-edit"/></button>
 		<button>Add keys <i class="zmdi zmdi-key"/></button>
-		<br>
-		<h3>https://unyw.github.io/repo-main/stable</h3><hr>
+		<button>Upgrade all <i class="zmdi zmdi-refresh-sync-alert"/></button>
+		{#await Unyw()
+			.then( ({file}) => file.read({path: '/etc/apk/repositories'}) )
+			.then( ({text}) => text.split('\n').filter(repo => repo && !repo.startsWith('https://dl-cdn.alpinelinux.org/alpine')))}
+				<span class="hidden"/>	
+		{:then repos} 
+			{#each repos as repo}
+			{#await fetch(`${repo}/manifest.json`).then( r => r.json())}
+				<span class="hidden"/>
+			{:then manifest} 
+				<h3>{repo}</h3><hr>
+				{#each manifest.apps as app}
+				<div class="app-container">
+					<div style="width: 60px; height:40px">
+						<img src={`${repo}/icons/${app}.png`} alt={`Icon for ${app}`} height="40px">
+					</div>
+					<span style="font-size: 1rem">{app}</span>
+				</div>
+				{/each}
+			{:catch e}
+				<span class="hidden"/>
+			{/await}
+
+			{/each}
+		{/await}
 	</div>
 	{:else if active === 'logs'}
 	<div class="page page-logs">
 		<select>
-			<option value="">-- Please choose an option --</option>
-			<option value="dog">Dog</option>
-			<option value="cat">Cat</option>
-			<option value="hamster">Hamster</option>
-			<option value="parrot">Parrot</option>		
+			<option value="">apk process</option>
 		</select>
 		<VncViewer/>
 	</div>
@@ -65,6 +86,7 @@
 	<div class="page page-settings">
 		<h1>Settings</h1>
 		<p>Work in progress :)</p>
+		<Checkbox>Debug mode</Checkbox>
 	</div>
 	{/if}
 	
@@ -77,6 +99,9 @@
 </main>
 
 <style>
+	.hidden {
+		display: none;
+	}
 	:global(body){
 		margin: 0px;
 		padding: 0px;
@@ -103,7 +128,7 @@
 	}
 
 	button {
-    margin: 0px;
+    margin: 5px 0;
     padding: 10px 20px;
 		border-radius: 20px;
   }
@@ -113,7 +138,7 @@
 		align-items: center;
 		border-radius: 10px;
 		background-color: #00000000;
-
+		min-height: 50px;
 		transition: background-color 0.05s ease;
 	}
 
@@ -124,9 +149,18 @@
 
 	}
 
+	.page-add h3 {
+		margin-top: 40px;
+	}
+
 	.page-logs {
 		display: flex;
 		padding-bottom: 20px;
 		flex-direction: column;
+	}
+
+	.page-settings h1 {
+		padding-top: 0;
+		margin-top: 0;
 	}
 </style>

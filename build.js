@@ -152,7 +152,7 @@ args.forEach(el => {
         ` && cp -R app/. ./.unyw_tmp/data/usr/share/unyw/apps/${appName}`)
       
       if(existsSync('app/icon.png')){
-        execSync(`cp app/icon.png '${distDir}/icons/${info.pkgname}'`)
+        execSync(`cp app/icon.png '${distDir}/icons/${info.pkgname}.png'`)
       }
     }
     if(existsSync(`control`))      execLive(`cp -R control/.      ./.unyw_tmp/control/`)
