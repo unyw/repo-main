@@ -1,25 +1,82 @@
+<script context="module">
+	let vnc
+
+	export function sendKey(...params) {
+	  vnc.contentWindow.vncConnection.sendKey(...params)
+	}
+
+  window.sendKeyVNC = sendKey
+  let isEmpty = true
+
+  export function handleEvent(event, e) {
+    const events = {
+      'keydown': (e) => vnc.contentWindow.vncConnection._keyboard._handleKeyDown(e),
+      'keyup':  (e) => vnc.contentWindow.vncConnection._keyboard._handleKeyUp(e),
+      'keypress':  (e) => vnc.contentWindow.vncConnection._keyboard._handleKeyPress(e),
+      'input': (e) => {
+        if(e.inputType === 'deleteContentBackward'){
+          sendKey(0xff08,null)
+          e.preventDefault()
+          return 
+        }
+        sendKey(e.data.charCodeAt(0), e.data.charCodeAt(0))
+      }
+    }
+
+    if(event === 'keydown' && e.keyCode === 229){
+      isEmpty = true
+    }
+
+    if(event == 'input'){
+      isEmpty = false
+    }
+
+    if(event === 'keyup' && e.keyCode === 229 && isEmpty){
+      sendKey(0xff08,null)
+      return
+    }
+	  events[event](e)
+	}
+</script>
+
 <script>
   import { onMount } from 'svelte';
   import Unyw from '@unyw/api'
 
   export let background = '#fff'
+  export let socket
 
   const UNYW_IP = window.__UNYW_PRIVATE_IP || 'localhost'
   const script = 'script'
 
   let vncInfo = Unyw().then( unyw => unyw.unyw.info())
-  let vncIframe
+  let vncIframe, vncFrame
+
+  $: { if(vncIframe != null){
+    handleResize()
+  }}
+
+  $: { if(vncFrame != null){
+      vnc = vncFrame
+  }}
+
+
+  const handleResize = async() =>{
+      if(!vncIframe) return null
+      const {process} = await Unyw()
+      return await process.screen({
+        socket: socket,
+        width: vncIframe.clientWidth,
+        height: vncIframe.clientHeight,
+
+      })
+    }  
+
   onMount(async () => {
-    const {process} = await Unyw()
-
-    console.log(await process.screen({
-
-      width: vncIframe.clientWidth,
-      height: vncIframe.clientHeight,
-
-    }))
-
-		console.log(vncIframe.clientWidth, vncIframe.clientHeight)
+    const myObserver = new ResizeObserver(entries => {
+      entries.forEach(() => handleResize())
+    })
+    myObserver.observe(vncIframe)
 	});
 </script>
 
@@ -43,7 +100,7 @@
     <span style="display: none"/>
   {:then {vnc: {token, width, height}}} 
 
-    <iframe id="lc-layout-vncviewer" title="vncviewer"
+    <iframe id="lc-layout-vncviewer" title="vncviewer" bind:this={vncFrame}
     srcdoc={`
     <html>
     <${script} src='./novnc/novnc.min.js'></${script}>
@@ -55,8 +112,7 @@
     <body style='overflow: hidden; padding: 0; margin:0; background-color: ${background};'>
       <${script}>
         window.onload = function(){
-          console.log('onload')
-          var vncConnection = new noVNC(
+          window.vncConnection = new noVNC(
               document.body,
               'ws://${UNYW_IP}:12081/websockify',
               {repeaterID: '',  shared: true,  credentials: { password: '${token}' }, }

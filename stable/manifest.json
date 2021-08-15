@@ -1,5 +1,6 @@
 {
   "apps": [
+    "unyw-app-chromium",
     "unyw-app-home",
     "unyw-app-xterm"
   ]

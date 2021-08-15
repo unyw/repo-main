@@ -2,8 +2,8 @@
   export let checked = false
 </script>
 
-<label class="pure-material-checkbox">
-  <input type="checkbox" bind:checked={checked}>
+<label on:click class="pure-material-checkbox">
+  <input type="checkbox" on:change bind:checked={checked}>
   <span>	
     <slot></slot>
   </span>

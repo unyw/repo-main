@@ -2,10 +2,12 @@
   "name": "unyw-app-xterm",
   "version": "1.0.0",
   "author": "Luca Fabbian <luca.fabbian.1999@gmail.com>",
-  "description": "Debyw bindings for XTerm",
+  "description": "Unyw xterm app",
   "license": "MIT",
   "unyw-pkginfo": {
-    "depend": []
+    "depend": [
+      "unyw", "xterm"
+    ]
   },
   "scripts": {
     "build": "rollup -c",
@@ -15,14 +17,19 @@
   "devDependencies": {
     "@rollup/plugin-commonjs": "^17.0.0",
     "@rollup/plugin-node-resolve": "^11.0.0",
+    "@rollup/plugin-replace": "^3.0.0",
+    "@unyw/ui": "file:../../npmlibs/unyw-ui",
+    "@unyw/api": "file:../../npmlibs/unyw-api",
     "rollup": "^2.3.4",
     "rollup-plugin-css-only": "^3.1.0",
     "rollup-plugin-livereload": "^2.0.0",
     "rollup-plugin-svelte": "^7.0.0",
     "rollup-plugin-terser": "^7.0.0",
+    "routie": "0.0.1",
     "svelte": "^3.0.0"
   },
   "dependencies": {
+    "rollup-plugin-serve": "^1.1.0",
     "sirv-cli": "^1.0.0"
   }
 }

@@ -6,7 +6,7 @@
   "license": "MIT",
   "unyw-pkginfo": {
     "depend": [
-      "unyw"
+      "unyw", "xterm"
     ]
   },
   "scripts": {
