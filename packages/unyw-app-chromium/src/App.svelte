@@ -10,7 +10,7 @@
 		Unyw()
 		  .then( ({process}) => process.screen({
 				socket,
-				command: 'chromium --no-sandbox'
+				command: 'chromium-browser --no-sandbox'
 			}))
 	}
 	
