@@ -5,7 +5,7 @@
   "description": "Unyw bridge for android",
   "license": "MIT",
   "unyw-pkginfo": {
-    "depend": ["x11vnc", "xvfb", "bspwm", "dropbear"],
+    "depend": ["x11vnc", "xvfb", "bspwm", "dropbear", "dtach"],
     "provides": "unyw"
   }
 }
