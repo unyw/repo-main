@@ -1,3 +1,4 @@
+export { default as Topbar } from './Topbar.svelte';
 export { default as Bottombar } from './Bottombar.svelte';
 export { default as Keyboardbar } from './Keyboardbar.svelte';
 export { default as Button }    from './Button.svelte';

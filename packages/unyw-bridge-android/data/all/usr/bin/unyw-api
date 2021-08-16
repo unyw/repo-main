@@ -1,0 +1,3 @@
+#!/bin/sh
+wget -O - -q --post-data="$2" localhost:12080"$1"?token=`cat /tmp/UNYW_TOKEN_API`
+

@@ -14,7 +14,7 @@
 		.then( ({file}) => file.read({path: '/etc/apk/repositories'}))
 		.then( ({text}) => textrepo = text)
 
-	const bashStr = str => `'${str.replace(`'`, `'"'"'`)}'`
+	const bashStr = str => `'${str.replaceAll(`'`, `'"'"'`)}'`
 
 	const run = async (command) => {
 		const {file,process} = await Unyw()

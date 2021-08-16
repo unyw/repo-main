@@ -2,6 +2,8 @@
   "apps": [
     "unyw-app-chromium",
     "unyw-app-home",
+    "unyw-app-libreoffice-converter",
+    "unyw-app-vscode-server",
     "unyw-app-xterm"
   ]
 }
