@@ -8,6 +8,15 @@
 
 	const bashStr = str => `'${str.replaceAll(`'`, `'"'"'`)}'`
 
+	const mimetypes = {
+		"pdf": "application/pdf",
+		"odt": "application/vnd.oasis.opendocument.text",
+		"doc": "application/msword",
+		"docx": "application/vnd.openxmlformats-officedocument.wordprocessingml",
+		"html": "text/html",
+		"txt": "text/plain",
+	}
+
 </script>
 {#if dialog}
 	<div class="dialog-mask" on:click={ () => dialog = false}/>
@@ -51,7 +60,7 @@
 				await process.screen({
 					socket,
 					command: `xterm -e  sh -c ${bashStr(`echo "Converting document..."; libreoffice --headless --convert-to ${format} /storage/unyw/libreoffice-converter/document --outdir /storage/unyw/libreoffice-converter; `+
-					`unyw-api /intent/open ${bashStr(`{"file":"document.${format}", "folder": "libreoffice-converter", "mimetype":"*/*"}`)}; echo ""; echo "Done!"; read`)}`
+					`unyw-api /intent/open ${bashStr(`{"file":"document.${format}", "folder": "libreoffice-converter", "mimetype":"${mimetypes[format]}"}`)}; echo ""; echo "Done!"; read`)}`
 					//	` unyw-api /intent/open ${bashStr(`{"file":"document.${format}", "folder":"libreoffice-converter", "mimetype":"*/*"}`)} ; echo "Done!"; read'`
 				})
 
@@ -59,8 +68,8 @@
 		}}>Convert</button></div>
 		
 	</div>
-	<p style="margin: 4px 16px;">Logs:</p>
-	<div style="height: 40vh;">
+	<h3 style="margin: 4px 16px;"><b><u>Logs:</u></b></h3>
+	<div style="height: 40vh; box-sizing: border-box; margin: 10px">
 		<VncViewer {socket}/>
 	</div>
 </main>
